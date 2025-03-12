@@ -26,7 +26,10 @@ def retrieve(query: str):
 tools = [retrieve]
 
 # Cria um template de prompt (substitua "Agent prompt template" pelo template desejado)
-prompt_template = PromptTemplate.from_template("Agent prompt template")
+prompt_template = PromptTemplate.from_template("""
+{input}
+{agent_scratchpad}
+""")
 
 # Cria o agente utilizando o mecanismo de chamadas de ferramenta
 agent = create_tool_calling_agent(llm, tools, prompt_template)

@@ -35,7 +35,6 @@ fastapi_rag_chatbot/
 │   │   └── supabase_client.py # Inicialização do cliente Supabase
 │── .env                   # Arquivo de variáveis de ambiente
 │── requirements.txt       # Dependências do projeto
-│── Dockerfile             # Arquivo para execução via Docker
 │── README.md              # Documentação do projeto
 ```
 
