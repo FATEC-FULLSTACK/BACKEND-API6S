@@ -1,31 +1,80 @@
+import os
+from dotenv import load_dotenv
+from fastapi import HTTPException
+from typing import Dict
+from langchain_openai import ChatOpenAI
 from app.models import ChatRequest
-from langchain_core.messages import HumanMessage, AIMessage
-from app.services.agent import get_agent_executor
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_ollama import OllamaLLM
+from langchain_deepseek import ChatDeepSeek
+from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 
-# Armazenamento em memória para o histórico de conversas
-chat_histories = {}
+# Carregar variáveis de ambiente
+load_dotenv()
 
-def process_chat(request: ChatRequest) -> dict:
+
+# LEITURA VARIÁVEL AMBIENTE.
+openai_api_key=os.getenv('OPENAI_API_KEY')
+llama_api_key=os.getenv('LLAMMA_API_KEY')
+google_api_key=os.getenv('GOOGLE_API_KEY')
+deepseek_api_key=os.getenv('DEEPSEEK_API_KEY')
+
+print(
+    openai_api_key,llama_api_key,google_api_key,deepseek_api_key
+)
+
+# Instanciar modelos
+openai = ChatOpenAI(model="gpt-4o", temperature=0, max_completion_tokens=500)
+#gemini = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0, max_tokens=500)
+#llama = OllamaLLM(model="llama3", temperature=0)
+#deepseek = ChatDeepSeek(model="deepseek-chat", temperature=0, max_tokens=500)
+
+# Criando o template de interação do chatbot
+chat_template = ChatPromptTemplate.from_messages(
+    [
+        SystemMessage(content=(
+            "Você é um assistente médico especializado em neurologia e doenças neurodegenerativas. "
+            "Sua função é fornecer respostas técnicas e baseadas em evidências sobre a Doença de Alzheimer. "
+            "Responda de forma clara, objetiva e fundamentada em artigos científicos recentes."
+        )),
+        HumanMessagePromptTemplate.from_template(
+            "Por favor, gere um relatório detalhado sobre os avanços no tratamento da Doença de Alzheimer com base na pergunta: \n {question}."
+        )
+    ]
+)
+
+# Criando as cadeias de processamento para cada LLM
+chain_openai = chat_template | openai
+#chain_gemini = chat_template | gemini
+#chain_llama = chat_template | llama
+#chain_deepseek = chat_template | deepseek
+
+
+# Função para processar o chat com todas as LLMs
+async def process_chat(request: ChatRequest) -> dict:
     user_id = request.user_id
     user_message = request.message
 
-    # Inicializa o histórico se não existir
-    if user_id not in chat_histories:
-        chat_histories[user_id] = []
-    
-    # Adiciona a mensagem do usuário ao histórico
-    chat_histories[user_id].append(HumanMessage(user_message))
-    
-    executor = get_agent_executor()
-    
     try:
-        # Invoca o executor do agente com a mensagem e o histórico atual
-        result = executor.invoke({"input": user_message, "chat_history": chat_histories[user_id]})
-        ai_message = result["output"]
-        
-        # Adiciona a resposta do agente ao histórico
-        chat_histories[user_id].append(AIMessage(ai_message))
-        
-        return {"reply": ai_message}
+        # Enviando a mesma pergunta para todas as LLMs
+        openai_response = await chain_openai.ainvoke({"question": user_message})
+        #gemini_response = chain_gemini.invoke({"question": user_message})
+        #llama_response = chain_llama.invoke({"question": user_message})
+        #deepseek_response = chain_deepseek.invoke({"question": user_message})
+
+        # Organizando a resposta em JSON estruturado
+        result = {
+            "user_id": user_id,
+            "question": user_message,
+            "responses": {
+                "openai": openai_response.content
+                #"gemini": gemini_response.content,
+                #"llama": llama_response.content,
+                #"deepseek": deepseek_response.content
+            }
+        }
+
+        return result
     except Exception as e:
-        raise Exception(f"Error processing chat: {e}")
+        raise HTTPException(status_code=500, detail=f"Erro ao processar o chat: {e}")

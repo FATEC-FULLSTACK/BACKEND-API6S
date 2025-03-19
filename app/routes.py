@@ -4,6 +4,8 @@ from app.services.chat import process_chat
 
 chat_router = APIRouter()
 
+
+# DEFINIÇÕES DE ROTAS PARA FAST API
 @chat_router.post("/chat")
 def chat(request: ChatRequest):
     try:

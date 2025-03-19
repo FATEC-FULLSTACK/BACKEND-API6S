@@ -7,6 +7,9 @@ python-dotenv
 streamlit
 langchain
 langchain-openai
+langchain_google_genai
+langchain_ollama
+langchain_deepseek
 langchain-core
 langchain-community
 langchainhub
