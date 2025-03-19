@@ -10,7 +10,7 @@ Um chatbot baseado em RAG (Retrieval-Augmented Generation) utilizando **FastAPI*
 - **[LangChain](https://www.langchain.com/)** - Ferramenta para criação de agentes LLM  
 - **[OpenAI GPT-4o](https://platform.openai.com/)** - Modelo de linguagem para processamento de texto  
 - **[Supabase](https://supabase.com/)** - Banco de dados PostgreSQL com armazenamento vetorial  
-- **[Docker](https://www.docker.com/)** - (Opcional) Para deploy containerizado  
+- **[Docker](https://www.docker.com/)** - (Opcional) Para deploy containerizado  (implementação futura)
 
 ---
 
@@ -27,12 +27,12 @@ fastapi_rag_chatbot/
 │   ├── services/
 │   │   ├── __init__.py
 │   │   ├── chat.py        # Serviço de gerenciamento de chat
-│   │   ├── embeddings.py  # Serviço de embeddings OpenAI
-│   │   ├── vector_store.py # Armazenamento vetorial Supabase
-│   │   ├── agent.py       # Criação do agente LLM
+│   │   ├── embeddings.py  # Serviço de embeddings OpenAI (implementação futura)
+│   │   ├── vector_store.py # Armazenamento vetorial Supabase (implementação futura)
 │   ├── utils/
 │   │   ├── __init__.py
-│   │   └── supabase_client.py # Inicialização do cliente Supabase
+│   │   └── database.py # (implementação futura)
+│── .env                   # Arquivo de variáveis de ambiente (necessário criar arquivo com base .env.model)
 │── .env                   # Arquivo de variáveis de ambiente
 │── requirements.txt       # Dependências do projeto
 │── README.md              # Documentação do projeto
@@ -47,7 +47,8 @@ Antes de instalar, certifique-se de ter os seguintes requisitos:
 - **Python 3.9+**  
 - **Pip** (Gerenciador de pacotes do Python)  
 - **Git** (Para controle de versão)  
-- **Conta no OpenAI** (Para API do GPT-4o)  
+- **Conta no OpenAI com 5$ créditos** (Para API do GPT-4o)  
+- **Conta no GEMINI com 5$ créditos** (Para API do gemini-1.5-pro)
 - **Conta no Supabase** (Para armazenamento vetorial)  
 
 ---
@@ -121,9 +122,11 @@ POST http://127.0.0.1:8000/chat
 
 **Body (JSON):**
 ```json
+"PERGUNTAS RELACIONADAS A DOENÇA ALZHEIMER"
+
 {
   "user_id": "123456",
-  "message": "Olá, como você está?"
+  "message": "ORIGEM DO ALZHEIMER?"
 }
 ```
 
