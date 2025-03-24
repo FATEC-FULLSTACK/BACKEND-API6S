@@ -1,7 +1,7 @@
 from fastapi import FastAPI
-from routes.chat_router import chat_router
-from routes.avaliacao_router import avalicao_router
-from config import load_environment
+from app.routes.chat_router import chat_router
+from app.routes.avaliacao_router import avalicao_router
+from app.config import load_environment
 
 # Carrega as variáveis de ambiente
 load_environment()

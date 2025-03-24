@@ -1,6 +1,6 @@
-from schema.schemas import individual_serial
-from database.config import avaliacao_collection
-from models.models import AvalicaoModel, NotasAtributos, ParseAvalicaoModelToDocument
+from app.schema.schemas import individual_serial
+from app.database.config import avaliacao_collection
+from app.models.models import AvalicaoModel, NotasAtributos, ParseAvalicaoModelToDocument
 from bson import ObjectId
 
 llms_disponiveis = ["ollama3", "openai", "gemini", "deepseek"]

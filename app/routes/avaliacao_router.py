@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from services.avaliacao import GetOneAvaliacao, PostAvaliacao
-from models.models import AvalicaoModel
+from app.services.avaliacao import GetOneAvaliacao, PostAvaliacao
+from app.models.models import AvalicaoModel
 
 avalicao_router = APIRouter(prefix="/avalicao")
 
