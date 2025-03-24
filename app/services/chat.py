@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from fastapi import HTTPException
 from typing import Dict
 from langchain_openai import ChatOpenAI
-from app.models import ChatRequest
+from models.models import ChatRequest
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_ollama import OllamaLLM
 from langchain_deepseek import ChatDeepSeek
