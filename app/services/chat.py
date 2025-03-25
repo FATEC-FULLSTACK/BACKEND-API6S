@@ -67,7 +67,7 @@ async def process_chat(request: ChatRequest) -> dict:
     try:
         # Enviando a mesma pergunta para todas as LLMs
         openai_response = await chain_openai.ainvoke({"question": user_message})
-        gemini_response = await chain_gemini.invoke({"question": user_message})
+        gemini_response = await chain_gemini.ainvoke({"question": user_message})
         #llama_response = await chain_llama.invoke({"question": user_message})
         #deepseek_response = await chain_deepseek.invoke({"question": user_message})
 
