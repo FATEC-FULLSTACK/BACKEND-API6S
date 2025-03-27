@@ -1,13 +1,13 @@
 from fastapi import APIRouter
 from app.services.avaliacao import GetOneAvaliacao, PostAvaliacao
-from app.models.models import AvalicaoModel
+from app.models.models import AvaliacaoModel
 
-avalicao_router = APIRouter(prefix="/avalicao")
+avaliacao_router = APIRouter(prefix="/avaliacao")
 
-@avalicao_router.post("/")
-async def CreateAvalicao(avalicao: AvalicaoModel):
-    return await PostAvaliacao(avaliacao=avalicao)
+@avaliacao_router.post("/")
+async def CreateAvaliacao(avaliacao: AvaliacaoModel):
+    return await PostAvaliacao(avaliacao=avaliacao)
 
-@avalicao_router.get("/{id}")
-async def FindOneAvalicao(id:str):
+@avaliacao_router.get("/{id}")
+async def FindOneAvaliacao(id:str):
     return await GetOneAvaliacao(id=id)

@@ -1,6 +1,6 @@
 def individual_serial(avaliacao) -> dict:
     return {
-        "id_avalicao": str(avaliacao["_id"]),
+        "id_avaliacao": str(avaliacao["_id"]),
         "llm1": avaliacao["llm1"],
         "llm2": avaliacao["llm2"],
         "endereco_ip_user": avaliacao["endereco_ip_user"],
