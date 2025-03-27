@@ -2,6 +2,7 @@ from app.schema.schemas import individual_serial
 from app.database.config import avaliacao_collection
 from app.models.models import AvaliacaoModel, NotasAtributos, ParseAvaliacaoModelToDocument
 from bson import ObjectId
+from app.utils.validacao import validar_atributos
 
 llms_disponiveis = ["ollama3", "openai", "gemini", "deepseek"]
 
@@ -42,9 +43,9 @@ async def RemoveAvaliacao(id: str):
     else:
         return {"message": "Avaliação não encontrada"}
 
-def AtributoIsValid(notas: NotasAtributos) -> bool:
-    for nome, valor in notas.__dict__.items():
-        if valor > 5 or valor < 0:
-            return False
-    return True
-
+def AtributoIsValid(avaliacao: NotasAtributos) -> bool:
+    try:
+        validar_atributos(avaliacao)
+        return True
+    except ValueError:
+        return False
