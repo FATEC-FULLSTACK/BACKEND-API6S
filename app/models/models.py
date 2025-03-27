@@ -12,7 +12,7 @@ class NotasAtributos(BaseModel):
     atributo4: int
     atributo5: int
 
-class AvalicaoModel(BaseModel):
+class AvaliacaoModel(BaseModel):
     llm1: str
     llm2: str
     endereco_ip_user: str
@@ -24,7 +24,7 @@ class AvalicaoModel(BaseModel):
     feedback_usuario: str
     melhor_performance: str
 
-def ParseAvalicaoModelToDocument(avaliacao: AvalicaoModel):
+def ParseAvaliacaoModelToDocument(avaliacao: AvaliacaoModel):
     return {
         "llm1": avaliacao.llm1,
         "llm2": avaliacao.llm2,
