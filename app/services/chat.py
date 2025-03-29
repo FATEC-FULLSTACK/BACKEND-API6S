@@ -25,8 +25,8 @@ print(
 )
 
 # Instanciar modelos
-openai = ChatOpenAI(model="gpt-4o", temperature=0, max_completion_tokens=500)
-gemini = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0, max_tokens=500)
+openai = ChatOpenAI(model="gpt-4o", temperature=0, max_completion_tokens=1000)
+gemini = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0, max_tokens=1000)
 #llama = OllamaLLM(model="llama3", temperature=0)
 #deepseek = ChatDeepSeek(model="deepseek-chat", temperature=0, max_tokens=500)
 
