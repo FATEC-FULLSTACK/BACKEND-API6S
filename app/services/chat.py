@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from fastapi import HTTPException
 from typing import Dict
 from langchain_openai import ChatOpenAI
-from app.models import ChatRequest
+from app.models.models import ChatRequest
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_ollama import OllamaLLM
 from langchain_deepseek import ChatDeepSeek
@@ -25,8 +25,8 @@ print(
 )
 
 # Instanciar modelos
-openai = ChatOpenAI(model="gpt-4o", temperature=0, max_completion_tokens=500)
-gemini = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0, max_tokens=500)
+openai = ChatOpenAI(model="gpt-4o", temperature=0, max_completion_tokens=1000)
+gemini = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0, max_tokens=1000)
 #llama = OllamaLLM(model="llama3", temperature=0)
 #deepseek = ChatDeepSeek(model="deepseek-chat", temperature=0, max_tokens=500)
 
@@ -67,7 +67,7 @@ async def process_chat(request: ChatRequest) -> dict:
     try:
         # Enviando a mesma pergunta para todas as LLMs
         openai_response = await chain_openai.ainvoke({"question": user_message})
-        gemini_response = await chain_gemini.invoke({"question": user_message})
+        gemini_response = await chain_gemini.ainvoke({"question": user_message})
         #llama_response = await chain_llama.invoke({"question": user_message})
         #deepseek_response = await chain_deepseek.invoke({"question": user_message})
 
