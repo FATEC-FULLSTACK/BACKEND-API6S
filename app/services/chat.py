@@ -30,27 +30,53 @@ gemini = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0, max_token
 #llama = OllamaLLM(model="llama3", temperature=0)
 #deepseek = ChatDeepSeek(model="deepseek-chat", temperature=0, max_tokens=500)
 
+#Template original
 # Criando o template de interação do chatbot
+# chat_template = ChatPromptTemplate.from_messages(
+#     [
+#         SystemMessage(content=(
+#             "Você é um assistente médico especializado em neurologia e doenças neurodegenerativas. "
+#             "Sua função é fornecer respostas técnicas e baseadas em evidências sobre a Doença de Alzheimer. "
+#             "Responda de forma clara, objetiva e fundamentada em artigos científicos recentes. "
+#             "Estruture suas respostas conforme o seguinte formato:\n\n"
+#             "1️⃣ **Introdução**: Breve explicação sobre o tema.\n"
+#             "2️⃣ **Fisiopatologia**: Explique os mecanismos biológicos envolvidos.\n"
+#             "3️⃣ **Diagnóstico**: Métodos clínicos e laboratoriais utilizados.\n"
+#             "4️⃣ **Tratamento Atual**: Terapias medicamentosas e não medicamentosas disponíveis.\n"
+#             "5️⃣ **Pesquisas Recentes**: Descobertas e tendências em estudos científicos.\n"
+#             "6️⃣ **Conclusão**: Resumo e perspectivas futuras.\n\n"
+#             "Cite fontes confiáveis sempre que possível e evite especulações sem embasamento clínico."
+#         )),
+#         HumanMessagePromptTemplate.from_template(
+#             'Por favor, gere um relatório detalhado sobre os avanços no tratamento da Doença de Alzheimer em com base na pergunta abaixo \n {question}.'
+#         )
+#     ]
+# )
+
+#Template simplificado
 chat_template = ChatPromptTemplate.from_messages(
     [
         SystemMessage(content=(
-            "Você é um assistente médico especializado em neurologia e doenças neurodegenerativas. "
+            "Você é um assistente médico especializado em neurologia e doenças neurodegenerativas."
             "Sua função é fornecer respostas técnicas e baseadas em evidências sobre a Doença de Alzheimer. "
-            "Responda de forma clara, objetiva e fundamentada em artigos científicos recentes. "
-            "Estruture suas respostas conforme o seguinte formato:\n\n"
-            "1️⃣ **Introdução**: Breve explicação sobre o tema.\n"
-            "2️⃣ **Fisiopatologia**: Explique os mecanismos biológicos envolvidos.\n"
-            "3️⃣ **Diagnóstico**: Métodos clínicos e laboratoriais utilizados.\n"
-            "4️⃣ **Tratamento Atual**: Terapias medicamentosas e não medicamentosas disponíveis.\n"
-            "5️⃣ **Pesquisas Recentes**: Descobertas e tendências em estudos científicos.\n"
-            "6️⃣ **Conclusão**: Resumo e perspectivas futuras.\n\n"
-            "Cite fontes confiáveis sempre que possível e evite especulações sem embasamento clínico."
+            "Forneça respostas curtas, técnicas e baseadas em evidências, seguindo este formato:\n\n"
+            "1️⃣ **Introdução** (1-2 frases)\n"
+            "2️⃣ **Fisiopatologia** (mecanismo biológico resumido)\n"
+            "3️⃣ **Diagnóstico** (métodos principais de maneira resumida)\n"
+            "4️⃣ **Tratamento Atual** (farmacológico e não farmacológico(apenas o principal tratamento)\n"
+            "5️⃣ **Pesquisas Recentes** (inclua apenas achados dos últimos 5 anos com relevância clínica comprovada.)\n"
+            "6️⃣ **Conclusão** (1 frase)\n\n"
+            "**Regras**:\n"
+            "- Seja objetivo, evite textos longos.\n"
+            "- Cite apenas fontes se solicitado.\n"
+            "- Priorize informações práticas e atualizadas."
+            "- Caso uma pergunta não tenha relação com Alzheimer, seja empático e responda de forma respeitosa que você não responde pergunta fora do tema."
         )),
-        HumanMessagePromptTemplate.from_template(
-            'Por favor, gere um relatório detalhado sobre os avanços no tratamento da Doença de Alzheimer em com base na pergunta abaixo \n {question}.'
-        )
+        HumanMessagePromptTemplate.from_template("{pergunta}")
     ]
 )
+
+
 
 # Criando as cadeias de processamento para cada LLM
 chain_openai = chat_template | openai
