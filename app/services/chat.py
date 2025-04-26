@@ -72,7 +72,7 @@ chat_template = ChatPromptTemplate.from_messages(
             "- Priorize informações práticas e atualizadas."
             "- Caso uma pergunta não tenha relação com Alzheimer, seja empático e responda de forma respeitosa que você não responde pergunta fora do tema."
         )),
-        HumanMessagePromptTemplate.from_template("{pergunta}")
+        HumanMessagePromptTemplate.from_template("{question}")
     ]
 )
 
