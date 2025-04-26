@@ -9,6 +9,7 @@ from langchain_ollama import OllamaLLM
 from langchain_deepseek import ChatDeepSeek
 from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
+from app.database.chroma_database import get_vector_database
 
 # Carregar variáveis de ambiente
 load_dotenv()
@@ -19,6 +20,14 @@ openai_api_key=os.getenv('OPENAI_API_KEY')
 llama_api_key=os.getenv('LLAMMA_API_KEY')
 google_api_key=os.getenv('GOOGLE_API_KEY')
 deepseek_api_key=os.getenv('DEEPSEEK_API_KEY')
+chroma_db = get_vector_database()
+
+def retrieve_docs(query : str, n_results : int):
+    results = chroma_db.query(query_texts=query, n_results=n_results)
+    if results == 0:
+        print("não foi encontrado nenhum documento semelhante")
+    return results
+
 
 print(
     openai_api_key,llama_api_key,google_api_key,deepseek_api_key
@@ -27,8 +36,6 @@ print(
 # Instanciar modelos
 openai = ChatOpenAI(model="gpt-4o", temperature=0, max_completion_tokens=1000)
 gemini = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0, max_tokens=1000)
-#llama = OllamaLLM(model="llama3", temperature=0)
-#deepseek = ChatDeepSeek(model="deepseek-chat", temperature=0, max_tokens=500)
 
 # Criando o template de interação do chatbot
 chat_template = ChatPromptTemplate.from_messages(
@@ -47,7 +54,7 @@ chat_template = ChatPromptTemplate.from_messages(
             "Cite fontes confiáveis sempre que possível e evite especulações sem embasamento clínico."
         )),
         HumanMessagePromptTemplate.from_template(
-            'Por favor, gere um relatório detalhado sobre os avanços no tratamento da Doença de Alzheimer em com base na pergunta abaixo \n {question}.'
+            'Por favor, gere um relatório detalhado sobre os avanços no tratamento da Doença de Alzheimer em com base na pergunta abaixo \n {question}.\nUse como base esse contexto: {context}'
         )
     ]
 )
@@ -55,21 +62,19 @@ chat_template = ChatPromptTemplate.from_messages(
 # Criando as cadeias de processamento para cada LLM
 chain_openai = chat_template | openai
 chain_gemini = chat_template | gemini
-#chain_llama = chat_template | llama
-#chain_deepseek = chat_template | deepseek
-
 
 # Função para processar o chat com todas as LLMs
 async def process_chat(request: ChatRequest) -> dict:
     user_id = request.user_id
     user_message = request.message
 
+    results = retrieve_docs(query=user_message, n_results=3)
+    print(results["documents"][0])
+
     try:
         # Enviando a mesma pergunta para todas as LLMs
-        openai_response = await chain_openai.ainvoke({"question": user_message})
-        gemini_response = await chain_gemini.ainvoke({"question": user_message})
-        #llama_response = await chain_llama.invoke({"question": user_message})
-        #deepseek_response = await chain_deepseek.invoke({"question": user_message})
+        openai_response = await chain_openai.ainvoke({"question": user_message, "context": results["documents"][0]})
+        gemini_response = await chain_gemini.ainvoke({"question": user_message, "context": results["documents"][0]})
 
         # Organizando a resposta em JSON estruturado
         result = {
@@ -78,8 +83,6 @@ async def process_chat(request: ChatRequest) -> dict:
             "responses": {
                 "openai": openai_response.content,
                 "gemini": gemini_response.content
-                #"llama": llama_response.content,
-                #"deepseek": deepseek_response.content
             }
         }
 
