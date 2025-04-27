@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from pydantic import SecretStr
 from fastapi import HTTPException
 from typing import Dict
 from langchain_openai import ChatOpenAI
@@ -7,6 +8,7 @@ from app.models.models import ChatRequest
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_ollama import OllamaLLM
 from langchain_deepseek import ChatDeepSeek
+from langchain_groq import ChatGroq
 from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from app.database.chroma_database import get_vector_database
@@ -20,6 +22,7 @@ openai_api_key=os.getenv('OPENAI_API_KEY')
 llama_api_key=os.getenv('LLAMMA_API_KEY')
 google_api_key=os.getenv('GOOGLE_API_KEY')
 deepseek_api_key=os.getenv('DEEPSEEK_API_KEY')
+groq_api_key = SecretStr(os.getenv('GROQ_API_KEY') or "") # implementado ultima revisão
 chroma_db = get_vector_database()
 
 def retrieve_docs(query : str, n_results : int):
@@ -36,6 +39,10 @@ print(
 # Instanciar modelos
 openai = ChatOpenAI(model="gpt-4o", temperature=0, max_completion_tokens=1000)
 gemini = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0, max_tokens=1000)
+deepseek = ChatDeepSeek(model="deepseek-chat", temperature=0, max_tokens=1000)
+groq = ChatGroq(model="llama3-70b-8192", api_key=groq_api_key, temperature=0, max_tokens=1000)
+
+
 
 #Template original
 # Criando o template de interação do chatbot
@@ -90,6 +97,8 @@ chat_template = ChatPromptTemplate.from_messages(
 # Criando as cadeias de processamento para cada LLM
 chain_openai = chat_template | openai
 chain_gemini = chat_template | gemini
+chain_deepseek = chat_template | deepseek
+chain_groq = chat_template | groq
 
 # Função para processar o chat com todas as LLMs
 async def process_chat(request: ChatRequest) -> dict:
@@ -103,6 +112,9 @@ async def process_chat(request: ChatRequest) -> dict:
         # Enviando a mesma pergunta para todas as LLMs
         openai_response = await chain_openai.ainvoke({"question": user_message, "context": results["documents"][0]})
         gemini_response = await chain_gemini.ainvoke({"question": user_message, "context": results["documents"][0]})
+        deepseek_response = await chain_deepseek.ainvoke({"question": user_message, "context": results["documents"][0]})
+        groq_response = await chain_groq.ainvoke({"question": user_message, "context": results["documents"][0]})
+
 
         # Organizando a resposta em JSON estruturado
         result = {
@@ -110,7 +122,9 @@ async def process_chat(request: ChatRequest) -> dict:
             "question": user_message,
             "responses": {
                 "openai": openai_response.content,
-                "gemini": gemini_response.content
+                "gemini": gemini_response.content,
+                "deepseek": deepseek_response.content,
+                "groq": groq_response.content 
             }
         }
 
