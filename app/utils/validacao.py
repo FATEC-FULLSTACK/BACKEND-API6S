@@ -1,9 +1,9 @@
 from typing import List
-from app.models.models import NotasAtributos
+from app.models.models import Avaliacao
 
-VALID_FIELDS = ["coerencia", "respeito", "acuracia", "relevancia", "veracidade"]
+VALID_FIELDS = ["relevancia", "acuracia", "veracidade", "coerencia", "respeito", "idioma"]
 
-def validar_atributos(notas: NotasAtributos) -> bool:
+def validar_atributos(notas: Avaliacao) -> bool:
     campos_invalidos = [nome for nome in notas.dict().keys() if nome not in VALID_FIELDS]
     
     if campos_invalidos:
