@@ -1,6 +1,6 @@
 from app.schema.schemas import individual_serial
 from app.database.config import avaliacao_collection
-from app.models.models import AvaliacaoModel, NotasAtributos, ParseAvaliacaoModelToDocument
+from app.models.models import AvaliacaoModel, Avaliacao, ParseAvaliacaoModelToDocument
 from bson import ObjectId
 from app.utils.validacao import validar_atributos
 
@@ -43,7 +43,7 @@ async def RemoveAvaliacao(id: str):
     else:
         return {"message": "Avaliação não encontrada"}
 
-def AtributoIsValid(avaliacao: NotasAtributos) -> bool:
+def AtributoIsValid(avaliacao: Avaliacao) -> bool:
     try:
         validar_atributos(avaliacao)
         return True
