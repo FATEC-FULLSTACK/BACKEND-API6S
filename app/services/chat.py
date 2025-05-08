@@ -31,11 +31,6 @@ def retrieve_docs(query : str, n_results : int):
         print("não foi encontrado nenhum documento semelhante")
     return results
 
-
-print(
-    openai_api_key,llama_api_key,google_api_key,deepseek_api_key
-)
-
 # Instanciar modelos
 openai = ChatOpenAI(model="gpt-4o", temperature=0, max_completion_tokens=1000)
 gemini = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0, max_tokens=1000)
