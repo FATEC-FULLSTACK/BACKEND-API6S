@@ -14,8 +14,6 @@ async def stream_groq(request: ChatRequest) -> AsyncGenerator[str, None]:
     user_message = request.message
     summarized_context = await prepare_context_and_summary(user_message)
 
-    yield format_response("rag", summarized_context)
-
     try:
         result = await chain.ainvoke({"question": user_message, "context": summarized_context})
         content = getattr(result, "content", None)
