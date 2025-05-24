@@ -1,4 +1,5 @@
 import os
+import asyncio
 from dotenv import load_dotenv
 from pydantic import SecretStr
 from fastapi import HTTPException
@@ -75,11 +76,15 @@ async def process_chat(request: ChatRequest) -> dict:
 
     try:
         # Enviando a mesma pergunta para todas as LLMs
-        openai_response = await chain_openai.ainvoke({"question": user_message, "context": results["documents"][0]})
-        gemini_response = await chain_gemini.ainvoke({"question": user_message, "context": results["documents"][0]})
-        deepseek_response = await chain_deepseek.ainvoke({"question": user_message, "context": results["documents"][0]})
-        groq_response = await chain_groq.ainvoke({"question": user_message, "context": results["documents"][0]})
+        responses = await asyncio.gather(
+            chain_openai.ainvoke({"question": user_message, "context": results["documents"][0]}),
+            chain_gemini.ainvoke({"question": user_message, "context": results["documents"][0]}),
+            chain_deepseek.ainvoke({"question": user_message, "context": results["documents"][0]}),
+            chain_groq.ainvoke({"question": user_message, "context": results["documents"][0]}),
+            return_exceptions=True
+        )
 
+        openai_response, gemini_response, deepseek_response, groq_response = responses
 
         # Organizando a resposta em JSON estruturado
         result = {
