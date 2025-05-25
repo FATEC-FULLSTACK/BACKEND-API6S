@@ -4,7 +4,7 @@ from app.models.models import AvaliacaoModel, Avaliacao, ParseAvaliacaoModelToDo
 from bson import ObjectId
 from app.utils.validacao import validar_atributos
 
-llms_disponiveis = ["ollama3", "openai", "gemini", "deepseek"]
+llms_disponiveis = ["ollama3", "openai", "gemini", "deepseek", "groq"]
 
 async def PostAvaliacao(avaliacao: AvaliacaoModel):
     if (avaliacao.llm1 not in llms_disponiveis or avaliacao.llm2 not in llms_disponiveis):
