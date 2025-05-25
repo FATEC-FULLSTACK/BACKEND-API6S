@@ -4,7 +4,7 @@ from app.models.models import AvaliacaoModel, Avaliacao, ParseAvaliacaoModelToDo
 from bson import ObjectId
 from app.utils.validacao import validar_atributos
 
-llms_disponiveis = ["ollama3", "openai", "gemini", "deepseek"]
+llms_disponiveis = ["ollama3", "openai", "gemini", "deepseek", "groq"]
 
 async def PostAvaliacao(avaliacao: AvaliacaoModel):
     if (avaliacao.llm1 not in llms_disponiveis or avaliacao.llm2 not in llms_disponiveis):
@@ -49,3 +49,77 @@ def AtributoIsValid(avaliacao: Avaliacao) -> bool:
         return True
     except ValueError:
         return False
+
+async def GetDesempenhoAvaliacao():
+    pipeline = [
+        {
+            "$facet": {
+                "participacao": [
+                    {
+                        "$project": {
+                            "llms": ["$llm1", "$llm2"]
+                        }
+                    },
+                    {
+                        "$unwind": "$llms"
+                    },
+                    {
+                        "$group": {
+                            "_id": "$llms",
+                            "total_participacao": {"$sum": 1}
+                        }
+                    }
+                ],
+                "melhor_performance": [
+                    {
+                        "$match": {
+                            "melhor_performance": {"$ne": None}
+                        }
+                    },
+                    {
+                        "$group": {
+                            "_id": "$melhor_performance",
+                            "total_melhor_performance": {"$sum": 1}
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "$project": {
+                "merged": {
+                    "$concatArrays": ["$participacao", "$melhor_performance"]
+                }
+            }
+        },
+        {
+            "$unwind": "$merged"
+        },
+        {
+            "$group": {
+                "_id": "$merged._id",
+                "total_participacao": {"$max": "$merged.total_participacao"},
+                "total_melhor_performance": {"$max": "$merged.total_melhor_performance"}
+            }
+        },
+        {
+            "$project": {
+                "nome_llm": "$_id",
+                "total_participacao": {
+                    "$ifNull": ["$total_participacao", 0]
+                },
+                "total_melhor_performance": {
+                    "$ifNull": ["$total_melhor_performance", 0]
+                },
+                "_id": 0
+            }
+        },
+        {
+            "$sort": {
+                "nome_llm": 1
+            }
+        }
+    ]
+
+    resultado = list(avaliacao_collection.aggregate(pipeline))
+    return resultado
